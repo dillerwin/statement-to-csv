@@ -9,10 +9,11 @@ if len(sys.argv) == 1:
 
 
 def parse_statement():
-	print(f"Translating statement at {pdf_path} into {csv_name}")
 
 	pdf_path = sys.argv[1]
 	csv_name = sys.argv[2] if len(sys.argv) > 2 else pdf_path.replace(".pdf", ".csv")
+
+	print(f"Translating statement at {pdf_path} into {csv_name}")
 
 	pdf = PdfReader(pdf_path)
 	pages = len(pdf.pages)
@@ -45,8 +46,8 @@ def parse_statement():
 			# starting_activity if statement above prevents capturing this section more than once
 			if "beginning balance" in line.lower():
 				dollar_idx = line.find("$")
-				beg_bal = line[dollar_idx+1:]
-				starting_balance += float(line[dollar_idx+1:])
+                # replace removes commas from larger amounts
+				starting_balance += float(line[dollar_idx+1:].replace(",", ""))
 				continue
 				# end beginning balance
 
@@ -74,7 +75,8 @@ def parse_statement():
 					ending_activity = False
 					# regex finds the last number in the line, then uses the $ and that number to collect the actual dollar amount
 					match = re.match('.+([0-9])[^0-9]*$',line).group(1)
-					eb = float(line[line.find("$")+1:line.rfind(match)+1])
+                    # replace removes commas from larger amounts7
+					eb = float(line[line.find("$")+1:line.rfind(match)+1].replace(",", ""))
 					ending_balance += eb
 				continue
 
